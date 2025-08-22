@@ -1,0 +1,161 @@
+show databases;
+
+
+create database library;
+
+use library;
+
+CREATE TABLE Authors (
+    AuthorID INT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Country VARCHAR(50)
+);
+
+CREATE TABLE Books (
+    BookID INT PRIMARY KEY,
+    Title VARCHAR(100) NOT NULL,
+    AuthorID INT,
+    PublishedYear INT,
+    Genre VARCHAR(50),
+    FOREIGN KEY (AuthorID) REFERENCES Authors(AuthorID)
+);
+
+SHOW TABLES;
+
+CREATE TABLE Borrowers (
+    BorrowerID INT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Contact VARCHAR(15)
+);
+
+
+
+CREATE TABLE BorrowedBooks (
+    BorrowID INT PRIMARY KEY,
+    BorrowerID INT,
+    BookID INT,
+    BorrowDate DATE,
+    ReturnDate DATE,
+    FOREIGN KEY (BorrowerID) REFERENCES Borrowers(BorrowerID),
+    FOREIGN KEY (BookID) REFERENCES Books(BookID)
+);
+
+
+INSERT INTO Authors (AuthorID, Name, Country) VALUES
+(1, 'J.K. Rowling', 'UK'),
+(2, 'George Orwell', 'UK'),
+(3, 'Jane Austen', 'UK'),
+(4, 'Mark Twain', 'USA'),
+(5, 'Haruki Murakami', 'Japan'),
+(6, 'Leo Tolstoy', 'Russia'),
+(7, 'Agatha Christie', 'UK'),
+(8, 'Ernest Hemingway', 'USA'),
+(9, 'Paulo Coelho', 'Brazil'),
+(10, 'Khaled Hosseini', 'Afghanistan');
+
+INSERT INTO Authors (AuthorID, Name, Country) VALUES
+(1, 'Chetan Bhagat', 'India'),
+(2, 'Arundhati Roy', 'India'),
+(3, 'Jhumpa Lahiri', 'India'),
+(4, 'Ruskin Bond', 'India'),
+(5, 'R. K. Narayan', 'India'),
+(6, 'Amish Tripathi', 'India'),
+(7, 'J.K. Rowling', 'UK'),
+(8, 'George Orwell', 'UK'),
+(9, 'Dan Brown', 'USA'),
+(10, 'Haruki Murakami', 'Japan');
+
+SELECT * FROM Authors;
+
+
+
+INSERT INTO Books (BookID, Title, AuthorID, PublishedYear, Genre) VALUES
+(1, 'Five Point Someone', 1, 2004, 'Fiction'),
+(2, 'The White Tiger', 2, 2008, 'Fiction'),
+(3, 'Interpreter of Maladies', 3, 1999, 'Short Stories'),
+(4, 'The Room on the Roof', 4, 1956, 'Fiction'),
+(5, 'Malgudi Days', 5, 1943, 'Fiction'),
+(6, 'The Immortals of Meluha', 6, 2010, 'Mythology'),
+(7, 'Harry Potter and the Philosopher\'s Stone', 7, 1997, 'Fantasy'),
+(8, '1984', 8, 1949, 'Dystopian'),
+(9, 'Angels & Demons', 9, 2000, 'Thriller'),
+(10, 'Norwegian Wood', 10, 1987, 'Romance'),
+(11, 'Revolution 2020', 1, 2011, 'Drama'),
+(12, 'The Ministry of Utmost Happiness', 2, 2017, 'Fiction'),
+(13, 'The Namesake', 3, 2003, 'Fiction'),
+(14, 'Delhi Is Not Far', 4, 1994, 'Fiction'),
+(15, 'The Guide', 5, 1958, 'Drama'),
+(16, 'Sita: Warrior of Mithila', 6, 2017, 'Mythology'),
+(17, 'Harry Potter and the Chamber of Secrets', 7, 1998, 'Fantasy'),
+(18, 'Animal Farm', 8, 1945, 'Political Satire'),
+(19, 'The Da Vinci Code', 9, 2003, 'Thriller'),
+(20, 'Kafka on the Shore', 10, 2002, 'Magical Realism');
+
+
+SELECT * FROM Books;
+
+
+INSERT INTO Borrowers (BorrowerID, Name, Contact) VALUES
+(1, 'Rahul Sharma', '9876543210'),
+(2, 'Anjali Mehta', '9123456780'),
+(3, 'Sneha Kapoor', '9988776655'),
+(4, 'Amitabh Joshi', '9090909090'),
+(5, 'Priya Nair', '9765432109'),
+(6, 'Rajeev Bansal', '9888899999'),
+(7, 'Fatima Khan', '9000011111'),
+(8, 'Yash Patel', '9833224455'),
+(9, 'Divya Singh', '9345678901'),
+(10, 'Karan Oberoi', '9876567890');
+
+
+SELECT * FROM Borrowers;
+
+INSERT INTO BorrowedBooks (BorrowID, BorrowerID, BookID, BorrowDate, ReturnDate) VALUES
+(1, 1, 3, '2025-06-20', '2025-07-05'),
+(2, 2, 6, '2025-06-25', '2025-07-10'),
+(3, 3, 1, '2025-06-28', NULL),
+(4, 4, 9, '2025-06-15', '2025-06-30'),
+(5, 5, 17, '2025-06-22', NULL),
+(6, 1, 2, '2025-07-01', NULL),
+(7, 2, 12, '2025-07-02', NULL);
+
+SELECT * FROM BorrowedBooks;
+
+-- Retrieve all books published after 2015.
+SELECT * FROM Books WHERE PublishedYear > 2015;
+
+-- List all borrowers who have borrowed books in the "Fiction" genre.
+SELECT DISTINCT b.BorrowerID, b.Name, b.Contact , bk.Genre
+FROM Borrowers b
+JOIN BorrowedBooks bb ON b.BorrowerID = bb.BorrowerID
+JOIN Books bk ON bb.BookID = bk.BookID
+WHERE bk.Genre = 'Fiction';
+
+-- Find the most borrowed book.
+SELECT bk.BookID, bk.Title, COUNT(bb.BookID) AS BorrowCount
+FROM BorrowedBooks bb
+JOIN Books bk ON bb.BookID = bk.BookID
+GROUP BY bk.BookID, bk.Title
+ORDER BY BorrowCount DESC
+LIMIT 1;
+
+-- 	Display the names of authors whose books are currently borrowed.
+SELECT DISTINCT a.AuthorID, a.Name, a.Country
+FROM Authors a
+JOIN Books bk ON a.AuthorID = bk.AuthorID
+JOIN BorrowedBooks bb ON bk.BookID = bb.BookID
+WHERE bb.ReturnDate IS NULL;
+
+
+-- 	Count the total number of books in each genre.
+SELECT Genre, COUNT(*) AS TotalBooks
+FROM Books
+GROUP BY Genre
+ORDER BY TotalBooks DESC;
+
+
+
+
+
+
+
